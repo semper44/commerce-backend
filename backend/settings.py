@@ -191,8 +191,7 @@ CORS_ALLOW_ALL_ORIGINS= True
 # flutterwave= env('FLW_SECRET_HASH')
 # print(os.getpid())
 # print(os.getp)
-ADMINS=[("emmanuel", "emmanuel47peters@gmail.com")]
-MANAGERS=[("emmanuel", "emmanuel47peters@gmail.com")]
+
 
 EMAIL_BACKEND = "django.core.mail.backends.filebased.EmailBackend"
 EMAIL_FILE_PATH = BASE_DIR / "sent_emails"
