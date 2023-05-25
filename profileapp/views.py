@@ -251,6 +251,7 @@ class AllFollowers(APIView):
     def  get(self, request, pk):
         arr= []
         user= Profile.objects.get(user=pk)
+        # user= Profile.objects.select_related.(user=pk)
         for i in user.followers.all():
             follower= Profile.objects.get(user=i)
             serializer= profileapi(follower)

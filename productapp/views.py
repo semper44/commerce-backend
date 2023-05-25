@@ -116,11 +116,7 @@ class AddToCart(APIView):
     parser_classes= [MultiPartParser, FormParser]
     permission_classes= [permissions.IsAuthenticated]
     def post(self, request, format=None):
-        # print(request.user.id)
         print(request.data)
-        # product= Cart.objects.get(id=58)
-        # products=product.item
-        # print(products.category.all())
         if request.user.id:
             profile=Profile.objects.get(user=request.user.id)
             items= json.loads(request.data["item"])
@@ -159,19 +155,11 @@ class RetrieveCart(APIView):
         else:
             return Response({"msg":"cart not found"}, status=status.HTTP_201_CREATED)
 
-    
-        
-        # print(category)
-        # if cart.exists():
-        #     return cart
-        # else:
-        #     return {"msg": "cart is empty"}
-        
 class PlaceOrder(APIView):
     def post(self, request, *args, **kwargs):       
-        print(request.data)
         auth_token = env("PAYSTACK_AUTH_TOKEN")
-        hed = {'Authorization': 'Bearer ' + auth_token}
+        print(request.data)
+        hed = {'Authorization': 'Bearer' + auth_token}
         metadata= json.dumps({"cart_id":2})
         cartId=request.data["cartId"]
         print(cartId)
@@ -186,6 +174,7 @@ class PlaceOrder(APIView):
                 itemz=Product.objects.get(id=i)
                 carts.item.add(itemz)
             carts.save()
+            # carts.save()
         else:
         # cartId=59
             datum={    
@@ -214,7 +203,7 @@ class ConfirmAndUpdateOrder(APIView):
         print(request.data)
         reference=None
         auth_token = env("PAYSTACK_AUTH_TOKEN")
-        hed = {'Authorization': 'Bearer ' + auth_token}
+        hed = {'Authorization': 'Bearer' + auth_token}
        
         try:
             reference=request.data['reference']

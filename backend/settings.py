@@ -26,9 +26,11 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = env("DJANGO_SECRET_KEY")
+SESSION_COOKIE_SECURE= True
+CSRF_COOKIE_SECURE=True
  
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ['*','https://cca9-197-210-227-235.ngrok-free.app','197.210.226.187' ]
 
@@ -189,6 +191,8 @@ CORS_ALLOW_ALL_ORIGINS= True
 # flutterwave= env('FLW_SECRET_HASH')
 # print(os.getpid())
 # print(os.getp)
+ADMINS=[("emmanuel", "emmanuel47peters@gmail.com")]
+MANAGERS=[("emmanuel", "emmanuel47peters@gmail.com")]
 
 EMAIL_BACKEND = "django.core.mail.backends.filebased.EmailBackend"
 EMAIL_FILE_PATH = BASE_DIR / "sent_emails"
