@@ -7,6 +7,32 @@ from rest_framework.exceptions import AuthenticationFailed
 from rest_framework_simplejwt.tokens import RefreshToken, TokenError
 
 
+
+from django.contrib.auth.models import User
+from rest_framework import serializers
+
+class UserRegistrationSerializer(serializers.ModelSerializer):
+    password2 = serializers.CharField(write_only=True)
+
+    class Meta:
+        model = User
+        fields = ('username', 'password', 'password2')
+
+    def validate(self, attrs):
+        if attrs['password'] != attrs['password2']:
+            raise serializers.ValidationError("Passwords do not match.")
+        return attrs
+
+    def create(self, validated_data):
+        user = User(username=validated_data['username'])
+        user.set_password(validated_data['password'])
+        user.save()
+        return user
+    # def to_representation(self, instance):
+    #     representation= super().to_representation(instance)
+    #     return{'user':representation}
+
+
 class profileapi(serializers.ModelSerializer):
     class Meta:
         model= Profile

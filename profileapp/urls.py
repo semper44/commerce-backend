@@ -32,9 +32,10 @@ from .views import (
     AllFollowers,
     AllFollowing,
     MonthlyUsers,
-    OrdersAUserMade,
+    YourOrders,
     TotalUsers,
-    checkFlutterWave)
+    UserRegistrationView,
+    )
 from rest_framework_simplejwt.views import (
     TokenRefreshView,
 )
@@ -42,8 +43,9 @@ from rest_framework_simplejwt.views import (
 urlpatterns = [
     path('token/', MyTokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),   
+    path('register/', UserRegistrationView.as_view(), name='user-registration'),
     path('allprofiles/', AllProfiles.as_view(), name='all_products'),   
-    path('profdetails/<int:pk>/', UserProfileDetails.as_view(), name='profile_details'),   
+    path('profdetails/<str:username>/', UserProfileDetails.as_view(), name='profile_details'),   
     path('delete/<int:pk>/', UserProfileDelete.as_view(), name='delete'),   
     path('blockuser/<int:pk>/', BlockUser.as_view(), name='blockuser'),   
     path('blockseller/<int:pk>/', BlockSeller.as_view(), name='blockseller'),   
@@ -57,17 +59,17 @@ urlpatterns = [
     # path('reset/<uidb64>/<token>', auth_views.PasswordResetConfirmView.as_view(), name='password_reset_confirm'),   
     # path('reset_password_complete/', auth_views.PasswordResetCompleteView.as_view(), name='password_reset_complete'),   
     path('sellersprofileform/<int:pk>/', SellersProfileForm.as_view(), name='sellersprofileform'),   
-    path('follow/<int:pk>/', Follow.as_view(), name='Follow'),   
-    path('unfollow/<int:pk>/', Unfollow.as_view(), name='Follow'),   
+    path('follow/<str:username>/', Follow.as_view(), name='Follow'),   
+    path('unfollow/<str:username>/', Unfollow.as_view(), name='Follow'),   
     path('allfollowers/<int:pk>/', AllFollowers.as_view(), name='allfollowers'),   
     path('allfollowing/<int:pk>/', AllFollowing.as_view(), name='allfollowing'),   
-    # path('isFollowersdetails/<int:pk>/', isFollowersDetails.as_view(), name='FollowersDetails'),   
+    # pat('isFollowersdetails/<int:pk>/', isFollowersDetails.as_view(), name='FollowersDetails'),   
     path('sellers/', all_sellers_profile.as_view(), name='sellers'),   
     # path('just-sellers/<int:pk>/', Just_sellers.as_view(), name='just-sellers'),   
     path('update/profilepics/<int:pk>/', prof_pics_update.as_view(), name='update_prof_pics'),   
-    path('criticalrating/<int:pk>/', Critical.as_view(), name='criticalrating'),   
-    path('positiverating/<int:pk>/', Positive.as_view(), name='positiverating'),   
-    path('createreview', CreateReview.as_view(), name='createreview'),   
+    path('criticalrating/<str:username>/', Critical.as_view(), name='criticalrating'),   
+    path('positiverating/<str:username>/', Positive.as_view(), name='positiverating'),   
+    path('createreview/', CreateReview.as_view(), name='createreview'),   
     # path('allreviews/<int:pk>/', AllReviews.as_view(), name='allreviews'),   
     path('postnotifications/', PostNotifications.as_view(), name='postnotifications'),   
     path('getnotifications/', GetNotifications.as_view(), name='getnotifications'),   
@@ -75,10 +77,10 @@ urlpatterns = [
     path('postproductnotifications/', PostProductNotifications.as_view(), name='postproductnotifications'),   
     path('getproductnotifications/', ProductGetNotifications.as_view(), name='getproductnotifications'),   
     path('productedit/<int:pk>/', ProductEditNotification.as_view(), name='productedit'),   
-    path('checkflutterwave/<int:pk>/', checkFlutterWave.as_view(), name='getnotifications'),   
+    # path('checkflutterwave/<int:pk>/', checkFlutterWave.as_view(), name='getnotifications'),   
     path('monthlyusers/', MonthlyUsers.as_view(), name='monthlyusers'),   
     path('totalusers/', TotalUsers.as_view(), name='totalusers'),   
-    path('ordersusersmade/', OrdersAUserMade.as_view(), name='ordersusersmade'),   
+    path('yourorders/', YourOrders.as_view(), name='ordersusersmade'),   
     # path('request-reset-email/', RequestPasswordResetEmail.as_view(),
-    #      name="request-reset-email")
+    #      name="request-reset-emai"
 ]

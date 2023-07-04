@@ -35,8 +35,7 @@ def review_created(sender, instance, created, **kwargs):
 
         instance.sender_name=sender_.user.username
         instance.save(update_fields=["sender_name"])
-        print(receiver_.user.username)
-        
+                
 
        
 

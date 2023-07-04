@@ -10,17 +10,11 @@ from .models import Cart, MostBoughtData, Product
 #         cart1=Cart.objects.exclude(completed="no")
 #         for i in cart1:
 #             product1=i.item.all()
-#             # print(cart1)
-#             # print(cart1.category)
-#             print(product1.category)
-
+#             # #             # #             
 #         # cart=Cart.objects.get(item__category__in=product_id)
-#         # print(product1)
-#         # print(product.category)
-#         # print(vars(cart))
+#         # #         # #         # print(vars(cart))
 #         # print(cart._meta.get_fields())
 #         # product=Product.objects.filter(id=instance.item)
-#         # print(product)
-#         # MostBoughtData.objects.all().delete()
+#         # #         # MostBoughtData.objects.all().delete()
 #         # MostBoughtData.objects.create(most_bought=instance)
 

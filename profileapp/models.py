@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
+from django.utils.text import slugify
 
 
 # Create your models here.
@@ -39,14 +40,12 @@ BLOCKEDUSERS_CHOICES=(
 
 class Profile(models.Model):
     user= models.OneToOneField(User, on_delete=models.CASCADE)
-    name=models.CharField(max_length=50, default="a")
     pics = models.ImageField(null = True, blank =True, upload_to=upload_to, default='/profile/default.png')
     location = models.CharField(max_length=70,null = True, blank =True)
     ratings_value=models.IntegerField( null=True, blank=True)
     voucher= models.CharField(max_length=100,null = True, blank =True)
     tags=models.TextField(choices=TAGS_CHOICES, default="no-seller")
     blocked=models.TextField(choices=BLOCKEDUSERS_CHOICES, default="false")
-    isFollowing=models.CharField(max_length=30,choices=FOLLOWING_CHOICES, default="no")
     followers= models.ManyToManyField(User,related_name="followers", symmetrical=False, blank=True)
     following= models.ManyToManyField(User,related_name="following", symmetrical=False, blank=True)
     banckAccount=models.IntegerField(null=True, blank=True)
@@ -60,6 +59,12 @@ class Profile(models.Model):
     businessName=models.CharField(max_length=30, null=True, blank=True)
     notification= models.ManyToManyField(productNotifications, related_name="productnotification", blank=True)
     item= models.TextField(null=True, blank=True)
+    name=models.SlugField(unique=True, blank=True)
+
+    def save(self, *args, **kwargs):
+        if not self.name:
+            self.name= slugify(self.user)
+        super(Profile, self).save(*args, **kwargs)
 
     def __str__(self):
         return f"{self.user}"

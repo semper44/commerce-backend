@@ -11,20 +11,14 @@ class Sellerspermission(permissions.BasePermission):
         userProfile= Profile.objects.filter(user =  request.user, tags="seller")
         sellersgroup= User.objects.filter(id = request.user.id, groups__name= "bannedSellers")
         usersgroup= User.objects.filter(id = request.user.id, groups__name= "bannedUsers")
-        print(view)
-        print(sellersgroup.exists())
-        print(userProfile.exists())
         try:
             if request.user.is_superuser or(request.user.is_authenticated and userProfile.exists() and (sellersgroup.exists() == False)):
-                print("rice")
-                return True
+                                return True
             # elif request.user.is_superuser or(request.user.is_authenticated and userProfile.exists() and (usersgroup.exists() == False)):
-            #     print("rice")
-            #     return True
+            #                 #     return True
         except:
 
-            print("no-exist")
-            return False       
+                        return False       
 
 # class BannedUser(permissions.BasePermission):
 
@@ -36,14 +30,11 @@ class Sellerspermission(permissions.BasePermission):
 #         # userUser= User.objects.get(id =  request.user.id)
 #         # userProfile= Profile.objects.filter(user =  request.user, tags="seller")
 #         usergroup= User.objects.filter(id = request.user.id, groups__name= "bannedUsers")
-#         print(view)
-#         print(usergroup.exists())
+#         #         print(usergroup.exists())
 #         # print(userProfile.exists())
 #         try:
 #             if request.user.is_superuser or(request.user.is_authenticated and userProfile.exists() and (usergroup.exists() == False)):
-#                 print("rice")
-#                 return True
+#                 #                 return True
 #         except:
-#             print("no-exist")
-#             return False       
+#             #             return False       
         # return False

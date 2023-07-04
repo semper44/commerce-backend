@@ -14,6 +14,7 @@ from pathlib import Path
 from datetime import timedelta
 import os
 import environ
+import dj_database_url
 
 env= environ.Env()
 environ.Env.read_env()
@@ -28,12 +29,19 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = env("DJANGO_SECRET_KEY")
 SESSION_COOKIE_SECURE= True
 CSRF_COOKIE_SECURE=True
+SECURE_HSTS_SECONDS=3600
+SECURE_SSL_REDIRECT=True
+SECURE_HSTS_INCLUDE_SUBDOMAINS =True
+SECURE_HSTS_PRELOAD =True
  
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = 'RENDER' not in os.environ
 
-ALLOWED_HOSTS = ['*','https://cca9-197-210-227-235.ngrok-free.app','197.210.226.187' ]
+ALLOWED_HOSTS = []
 
+RENDER_EXTERNAL_HOSTNAME = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
+if RENDER_EXTERNAL_HOSTNAME:
+    ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
 
 # Application definition
 
@@ -92,10 +100,11 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+    'default': dj_database_url.config(
+        # Feel free to alter this value to suit your needs.
+        default='postgresql://postgres:postgres@localhost:5432/mysite',
+        conn_max_age=600
+    )
 }
 
 
@@ -190,9 +199,38 @@ CORS_ALLOW_ALL_ORIGINS= True
 
 # flutterwave= env('FLW_SECRET_HASH')
 # print(os.getpid())
-# print(os.getp)
-
+# print(os.getp
+ADMINS=[("emmanuel", "emmanuel47peters@gmail.com")]
+MANAGERS=[("emmanuel", "emmanuel47peters@gmail.com")]
 
 EMAIL_BACKEND = "django.core.mail.backends.filebased.EmailBackend"
 EMAIL_FILE_PATH = BASE_DIR / "sent_emails"
 
+
+def get_cache():
+  try:
+    servers = os.environ['MEMCACHIER_SERVERS']
+    username = os.environ['MEMCACHIER_USERNAME']
+    password = os.environ['MEMCACHIER_PASSWORD']
+    return {
+      'default': {
+        'BACKEND': 'django_bmemcached.memcached.BMemcached',
+        # TIMEOUT is not the connection timeout! It's the default expiration
+        # timeout that should be applied to keys! Setting it to `None`
+        # disables expiration.
+        'TIMEOUT': 7,
+        'LOCATION': servers,
+        'OPTIONS': {
+          'username': username,
+          'password': password,
+        }
+      }
+    }
+  except:
+    return {
+      'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache'
+      }
+    }
+
+CACHES = get_cache()
