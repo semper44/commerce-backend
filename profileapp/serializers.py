@@ -38,6 +38,13 @@ class profileapi(serializers.ModelSerializer):
         model= Profile
         fields= "__all__"
 
+class FollowersApi(serializers.ModelSerializer):
+    class Meta:
+        model= Profile
+        fields=("pics", "location", "businessName", "name")
+
+
+
 class RelationshipApi(serializers.ModelSerializer):
     class Meta:
         model= Relationship

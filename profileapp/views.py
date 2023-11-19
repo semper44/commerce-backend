@@ -31,6 +31,7 @@ from .serializers import (
     productNotifications,
     UserApi,
     UserRegistrationSerializer,
+    FollowersApi,
     SetNewPasswordSerializer, ResetPasswordEmailRequestSerializer)
 
 # Create your views here.
@@ -177,50 +178,51 @@ class SellersProfileForm(generics.UpdateAPIView):
 
 ALL_FOLLOWERS_CACHE="tasks.followers"
 class AllFollowers(APIView):
-    def  get(self, request, pk):
-        tasks=cache.get(ALL_FOLLOWERS_CACHE)
+    def  get(self, request, username):
+        # tasks=cache.get(ALL_FOLLOWERS_CACHE)
+        tasks=False
         if not tasks:
             arr= []
-            user= Profile.objects.get(user=pk)
-            # user= Profile.objects.select_related.(user=pk)
+            prof = User.objects.get(username=username )
+            user= Profile.objects.get(user=prof)
             for i in user.followers.all():
                 follower= Profile.objects.get(user=i)
-                serializer= profileapi(follower)
+                serializer= FollowersApi(follower, context={'request':request})
                 arr.append(serializer.data)
             cache.set(ALL_FOLLOWERS_CACHE, arr)
             length=len(arr)
-            if length==0:
+            if length<1:
                 return Response({"msg":"No followers yet"},status=status.HTTP_417_EXPECTATION_FAILED)
             else:
                 return Response(arr, status=status.HTTP_200_OK)
         length=len(tasks)
-        if length==0:
+        if length<1:
             return Response({"msg":"No followers yet"},status=status.HTTP_417_EXPECTATION_FAILED)
         else:
-            return Response(arr, status=status.HTTP_200_OK)
+            return Response(tasks, status=status.HTTP_200_OK)
 
 ALL_FOLLOWING="tasks.following"
 class AllFollowing(APIView):
-    def  get(self, request, pk):
+    def  get(self, request, username):
         tasks=cache.get(ALL_FOLLOWING)
+        arr= []
         if not tasks:
-            arr= []
-            user= Profile.objects.get(user=pk)
+            prof = User.objects.get(username=username )
+            user= Profile.objects.get(user=prof)
             for i in user.following.all():
                 following= Profile.objects.get(user=i)
-                serializer= profileapi(following)
+                serializer= FollowersApi(following, context={'request':request})
                 arr.append(serializer.data)
             cache.set(ALL_FOLLOWING, arr)
-            length=len(arr)
-            if length==0:
+            if len(arr)<1:
                 return Response({"msg":"Following no one yet"},status=status.HTTP_417_EXPECTATION_FAILED)
             else:
                 return Response(arr, status=status.HTTP_200_OK)
-        length=len(tasks)
-        if length==0:
+        if len(tasks)<1:
             return Response({"msg":"Following no one yet"},status=status.HTTP_417_EXPECTATION_FAILED)
         else:
-            return Response(arr, status=status.HTTP_200_OK)
+            return Response(tasks, status=status.HTTP_200_OK)
+
 
 class Follow(APIView):
     permission_classes= [permissions.IsAuthenticated]

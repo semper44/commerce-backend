@@ -13,8 +13,8 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 from pathlib import Path
 from datetime import timedelta
 import os
-import environ
 import dj_database_url
+import environ
 
 env= environ.Env()
 environ.Env.read_env()
@@ -27,21 +27,45 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = env("DJANGO_SECRET_KEY")
-SESSION_COOKIE_SECURE= True
-CSRF_COOKIE_SECURE=True
-SECURE_HSTS_SECONDS=3600
-SECURE_SSL_REDIRECT=True
-SECURE_HSTS_INCLUDE_SUBDOMAINS =True
-SECURE_HSTS_PRELOAD =True
+
+HOST = env('HOST')
+PASSWORD = env('PASSWORD')
  
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = 'RENDER' not in os.environ
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["127.0.0.1:8000", "127.0.0.1"]
 
 RENDER_EXTERNAL_HOSTNAME = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
 if RENDER_EXTERNAL_HOSTNAME:
+    SESSION_COOKIE_SECURE= True
+    CSRF_COOKIE_SECURE=True
+    SECURE_HSTS_SECONDS=3600
+    SECURE_SSL_REDIRECT=True
+    SECURE_HSTS_INCLUDE_SUBDOMAINS =True
+    SECURE_HSTS_PRELOAD =True
     ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
+    DATABASES = {
+        'default': {
+
+            'ENGINE' : 'django.db.backends.postgresql_psycopg2',
+
+            'NAME': 'postgres',
+
+            'HOST' :HOST,
+
+            'PASSWORD':PASSWORD,
+
+            'PORT': 5432,
+
+            'USER': 'postgres',
+
+        }
+
+
+}
+
+
 
 # Application definition
 
@@ -99,13 +123,20 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
 
-DATABASES = {
-    'default': dj_database_url.config(
-        # Feel free to alter this value to suit your needs.
-        default='postgresql://postgres:postgres@localhost:5432/mysite',
-        conn_max_age=600
-    )
-}
+# DATABASES = {
+#     'default': dj_database_url.config(
+#         # Feel free to alter this value to suit your needs.
+#         default='postgresql://postgres:postgres@localhost:5432/mysite',
+#         conn_max_age=600
+#     )
+# }
+
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
+#     }
+# }
 
 
 # Password validation
@@ -234,3 +265,25 @@ def get_cache():
     }
 
 CACHES = get_cache()
+
+CORS_ALLOW_HEADERS = [
+    'accept',
+    'accept-encoding',
+    'authorization',
+    'content-type',
+    'dnt',
+    'origin',
+    'user-agent',
+    'x-csrftoken',
+    'x-requested-with',
+]
+
+CORS_ALLOW_METHODS = [
+    'DELETE',
+    'GET',
+    'OPTIONS',
+    'PATCH',
+    'POST',
+    'PUT',
+]
+
