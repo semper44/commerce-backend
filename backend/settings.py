@@ -45,25 +45,25 @@ if RENDER_EXTERNAL_HOSTNAME:
     SECURE_HSTS_INCLUDE_SUBDOMAINS =True
     SECURE_HSTS_PRELOAD =True
     ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
-    DATABASES = {
-        'default': {
+#     DATABASES = {
+#         'default': {
 
-            'ENGINE' : 'django.db.backends.postgresql_psycopg2',
+#             'ENGINE' : 'django.db.backends.postgresql_psycopg2',
 
-            'NAME': 'postgres',
+#             'NAME': 'postgres',
 
-            'HOST' :HOST,
+#             'HOST' :HOST,
 
-            'PASSWORD':PASSWORD,
+#             'PASSWORD':PASSWORD,
 
-            'PORT': 5432,
+#             'PORT': 5432,
 
-            'USER': 'postgres',
+#             'USER': 'postgres',
 
-        }
+#         }
 
 
-}
+# }
 
 
 
@@ -88,7 +88,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     "corsheaders.middleware.CorsMiddleware",
 
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -131,12 +131,12 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 #     )
 # }
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': BASE_DIR / 'db.sqlite3',
-#     }
-# }
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
+    }
+}
 
 
 # Password validation
@@ -222,18 +222,19 @@ SIMPLE_JWT = {
 }
 
 
-
-STATIC_URL = 'static/'
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
-
 STATICFILES_DIRS=[
     os.path.join(BASE_DIR, "static")
 ]
-STATIC_ROOT= os.path.join(BASE_DIR, 'staticfiles')
+STATIC_URL = 'static/'
 
 MEDIA_ROOT=os.path.join(BASE_DIR, 'media')
 MEDIA_URL='/media/'
 CORS_ALLOW_ALL_ORIGINS= True
+
+if not DEBUG:
+    STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
+    STATIC_ROOT= os.path.join(BASE_DIR, 'staticfiles')
 
 # flutterwave= env('FLW_SECRET_HASH')
 # print(os.getpid())
