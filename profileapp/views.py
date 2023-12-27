@@ -181,6 +181,7 @@ class SellersProfileForm(generics.UpdateAPIView):
 
 
 
+
 ALL_FOLLOWERS_CACHE="tasks.followers"
 class AllFollowers(APIView):
     def  get(self, request, username):
