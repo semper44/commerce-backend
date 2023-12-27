@@ -165,16 +165,21 @@ class BlockUser(APIView):
 
 class SellersProfileForm(generics.UpdateAPIView):
     permission_classes= [permissions.IsAuthenticated]
-    def  patch(self, request, pk):
+     def  patch(self, request, pk):
         user= Profile.objects.get(user=pk) 
-        serializer= profileapi(user,data=request.data, partial=True)
-        if serializer.is_valid():
-            serializer.save()
-            user.tags="seller"
-            user.save(update_fields=["tags"]) 
-            return Response(serializer.data, status=status.HTTP_200_OK)
+        if user.tags == "seller":
+            return Response("already a seller", status=status.HTTP_226_IM_USED)
         else:
-            return Response(serializer.data, status=status.HTTP_400_BAD_REQUEST)
+            serializer= profileapi(user,data=request.data, partial=True)
+            if serializer.is_valid():
+                serializer.save()
+                user.tags="seller"
+                user.save(update_fields=["tags"]) 
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            else:
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
 
 ALL_FOLLOWERS_CACHE="tasks.followers"
 class AllFollowers(APIView):
