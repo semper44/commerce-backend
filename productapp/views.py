@@ -155,7 +155,7 @@ class PlaceOrder(APIView):
         auth_token = env("PAYSTACK_AUTH_TOKEN")
         # hed = {'Authorization': 'Bearer sk_test_339102877aede0b62c4c8baa085b424e84dcb0ce'}
         hed2 = {'Authorization': 'Bearer'+" "+auth_token}
-       
+        print(hed2)
         cartId=request.data["cartId"]
         if cartId==None or cartId=="null":
             profile=Profile.objects.get(user=request.user.id)
@@ -195,6 +195,8 @@ class PlaceOrder(APIView):
             url = 'https://api.paystack.co/transaction/initialize'        
             response = requests.post(url, data=datum, headers=hed2)
             responses=response.json()
+            print(response)
+            print(responses)
             # link=response['data']['link']
             if responses["status"]==True:
                 return Response({"link":responses["data"]["authorization_url"], "code":200}, status=status.HTTP_200_OK)
