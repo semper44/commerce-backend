@@ -52,7 +52,7 @@ class Profile(models.Model):
     accountNumber=models.IntegerField(null=True, blank=True)
     subaccount_percentage=models.IntegerField(null=True, blank=True)
     subaccountId=models.CharField(max_length=30, null=True, blank=True)
-    phoneNumber=models.IntegerField(null=True, blank=True)
+    phoneNumber=models.CharField(null=True, blank=True, max_length=50)
     country=models.CharField(max_length=30, null=True, blank=True)
     state=models.CharField(max_length=30, null=True, blank=True)
     email=models.CharField(max_length=30, null=True, blank=True)
@@ -68,6 +68,7 @@ class Profile(models.Model):
 
     def __str__(self):
         return f"{self.user}"
+
 
 STATUS_CHOICES = (
     ("accept", "accept"),

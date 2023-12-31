@@ -9,21 +9,22 @@ from django.urls import reverse
 from .utils import Util
 from django.core.cache import cache
 # import pytz
-from django.shortcuts import redirect, render
+from django.shortcuts import redirect, render, get_object_or_404
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework import generics, permissions, status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.parsers import MultiPartParser, FormParser 
-from django.db.models import Q
+# from django.db.models import Q
 from django.contrib.auth.models import User, Group
-from productapp.serializers import SimpleCartapi
+# from productapp.serializers import SimpleCartapi
 from productapp.models import Cart, Product
-from .models import Profile, Review, Relationship, Notifications
+from .models import Profile, Review, Notifications
 from productapp.serializers import productCartApi
 from .serializers import (
     profileapi, 
+    Someprofileapi,
     RelationshipApi, 
     ReviewApi, 
     NotificationApi,
@@ -167,14 +168,19 @@ class SellersProfileForm(generics.UpdateAPIView):
     permission_classes= [permissions.IsAuthenticated]
     def  patch(self, request, pk):
         user= Profile.objects.get(user=pk) 
-        serializer= profileapi(user,data=request.data, partial=True)
-        if serializer.is_valid():
-            serializer.save()
-            user.tags="seller"
-            user.save(update_fields=["tags"]) 
-            return Response(serializer.data, status=status.HTTP_200_OK)
+        if user.tags == "seller":
+            return Response("already a seller", status=status.HTTP_226_IM_USED)
         else:
-            return Response(serializer.data, status=status.HTTP_400_BAD_REQUEST)
+            serializer= profileapi(user,data=request.data, partial=True)
+            if serializer.is_valid():
+                serializer.save()
+                user.tags="seller"
+                user.save(update_fields=["tags"]) 
+                return Response("successful", status=status.HTTP_200_OK)
+            else:
+                return Response(serializer.data, status=status.HTTP_400_BAD_REQUEST)
+
+
 
 ALL_FOLLOWERS_CACHE="tasks.followers"
 class AllFollowers(APIView):
@@ -252,7 +258,6 @@ class Unfollow(APIView):
             receiver_followers= Profile.objects.filter(user=user)
             followers=receiver_followers.values_list("followers")
             follow=len(followers)
-            #             # print(receiver.followers.all())
             data={"sender":sender, "receiver":receiver, "status":"delete", "followers":follow}
             serializer= RelationshipApi(data=data)
             if serializer.is_valid():
@@ -426,7 +431,6 @@ class PostNotifications(APIView):
 
     def post(self, request, format=None):
         serializer= NotificationApi(data=request.data)
-        # print(request.data
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
@@ -516,22 +520,34 @@ class MonthlyUsers(APIView):
         return Response(data, status=status.HTTP_200_OK)
 
 class YourOrders(APIView):
-    permission_classes= [permissions.IsAuthenticated]
+    # permission_classes= [permissions.IsAuthenticated]
     # serializer_class= SimpleCartapi
-    def  get(self, request, **kwargs):
-        profile=self.request.user.id
-        cart=Cart.objects.filter(owners=profile, completed="yes")
-        arr=[]
-        if cart.exists():
-            for i in cart:
-                cartProduct= i.item.all()
-                item= productCartApi(cartProduct, many=True, context={'request':request})
-                datas={"serializer":item.data,  "item_qty":i.item_qty}
-                arr.append(datas)
-                        # pass
-            return Response(arr, status=status.HTTP_200_OK)
+    def  get(self, request,username, **kwargs):
+        userexists = User.objects.filter(username=username)
+        if userexists.exists():
+            user = User.objects.get(username=username)
+            profile= Profile.objects.select_related('user').get(user = user)
+            cart=Cart.objects.filter(owners=profile, completed="yes")
+            arr=[]
+            if cart.exists():
+                for i in cart:
+                    cartProduct= i.item.all()
+                    item= productCartApi(cartProduct, many=True, context={'request':request})
+                    datas={"serializer":item.data,  "item_qty":i.item_qty}
+                    arr.append(datas)
+                            # pass
+                return Response(arr, status=status.HTTP_200_OK)
+            else:
+                return Response({"msg":"No purchased product found"}, status=status.HTTP_417_EXPECTATION_FAILED)
         else:
-            return Response({"msg":"No purchased product found"}, status=status.HTTP_417_EXPECTATION_FAILED)
+            return Response({"msg":"Sorry an error occured"}, status=status.HTTP_404_NOT_FOUND)
+
+class AllUsers(APIView):
+    def get(self, request):
+        total=Profile.objects.all()
+        serializer = Someprofileapi(total, many= True, context={'request':request})
+        return Response(serializer.data, status=status.HTTP_200_OK) 
+
 
 TOTAL_USERS="tasks.users"
 class TotalUsers(APIView):

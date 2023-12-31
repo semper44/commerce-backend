@@ -32,6 +32,7 @@ from .views import (
     AllFollowers,
     AllFollowing,
     MonthlyUsers,
+    AllUsers,
     YourOrders,
     TotalUsers,
     UserRegistrationView,
@@ -80,7 +81,8 @@ urlpatterns = [
     # path('checkflutterwave/<int:pk>/', checkFlutterWave.as_view(), name='getnotifications'),   
     path('monthlyusers/', MonthlyUsers.as_view(), name='monthlyusers'),   
     path('totalusers/', TotalUsers.as_view(), name='totalusers'),   
-    path('yourorders/', YourOrders.as_view(), name='ordersusersmade'),   
+    path('allusers/', AllUsers.as_view(), name='allusers'),   
+    path('yourorders/<str:username>/', YourOrders.as_view(), name='ordersusersmade'),   
     # path('request-reset-email/', RequestPasswordResetEmail.as_view(),
     #      name="request-reset-emai"
 ]

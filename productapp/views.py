@@ -111,10 +111,11 @@ class AddToCart(APIView):
             if request.user.id:
                 profile=Profile.objects.get(user=request.user.id)
                 items= json.loads(request.data["item"])
+                
                 qty= request.data["item_qty"]
                 cartSize= json.loads(request.data["cartSize"])
+                
                 cart= Cart.objects.filter(owners=request.user.id, completed="no")
-                # cart.form()
                 if cart.exists():
                     cart.delete()
                 carts= Cart.objects.create(owners=profile, item_qty= qty, cartSize=cartSize)
@@ -152,18 +153,15 @@ class PlaceOrder(APIView):
 
     def post(self, request, *args, **kwargs):       
         auth_token = env("PAYSTACK_AUTH_TOKEN")
-        hed = {'Authorization': 'Bearer' + auth_token}
-        # print(request.data)
-        print(request.data["cartId"])
+        # hed = {'Authorization': 'Bearer sk_test_339102877aede0b62c4c8baa085b424e84dcb0ce'}
+        hed2 = {'Authorization': 'Bearer'+" "+auth_token}
+       
         cartId=request.data["cartId"]
         if cartId==None or cartId=="null":
-            print("in")
             profile=Profile.objects.get(user=request.user.id)
             items= json.loads(request.data["item"])
             qty= request.data["item_qty"]
             cartSize= json.loads(request.data["cartSize"])
-            print(request.data)
-            print("request.data")
             carts= Cart.objects.create(owners=profile, item_qty= qty, cartSize=cartSize)
             for i in items:
                 itemz=Product.objects.get(id=i)
@@ -177,8 +175,7 @@ class PlaceOrder(APIView):
                 "metadata":metadata
                 }
             url = 'https://api.paystack.co/transaction/initialize' 
-            print(f"http://localhost:3000/confirmandupdateorder/{carts.id}/")       
-            response = requests.post(url, data=datum, headers=hed)
+            response = requests.post(url, data=datum, headers=hed2)
             responses=response.json()
             # link=response['data']['link']
             if responses["status"]==True:
@@ -196,7 +193,7 @@ class PlaceOrder(APIView):
                 "metadata":metadata
                 }
             url = 'https://api.paystack.co/transaction/initialize'        
-            response = requests.post(url, data=datum, headers=hed)
+            response = requests.post(url, data=datum, headers=hed2)
             responses=response.json()
             # link=response['data']['link']
             if responses["status"]==True:

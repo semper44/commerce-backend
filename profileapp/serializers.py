@@ -38,6 +38,14 @@ class profileapi(serializers.ModelSerializer):
         model= Profile
         fields= "__all__"
 
+class Someprofileapi(serializers.ModelSerializer):
+    username = serializers.CharField(source="user.username", read_only=True)
+    class Meta:
+        model= Profile
+        fields= ("pics", "username", "id", "tags", "blocked")
+
+
+
 class FollowersApi(serializers.ModelSerializer):
     class Meta:
         model= Profile
@@ -69,7 +77,6 @@ class UserApi(serializers.ModelSerializer):
     class Meta:
         model= User
         fields= "__all__"
-
 
 class ResetPasswordEmailRequestSerializer(serializers.Serializer):
     email = serializers.EmailField(min_length=2)
