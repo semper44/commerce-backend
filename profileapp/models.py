@@ -45,7 +45,7 @@ class Profile(models.Model):
     ratings_value=models.IntegerField( null=True, blank=True)
     voucher= models.CharField(max_length=100,null = True, blank =True)
     tags=models.TextField(choices=TAGS_CHOICES, default="no-seller")
-    blocked=models.TextField(choices=BLOCKEDUSERS_CHOICES, default="false")
+    blocked=models.BooleanField(default=False)
     followers= models.ManyToManyField(User,related_name="followers", symmetrical=False, blank=True)
     following= models.ManyToManyField(User,related_name="following", symmetrical=False, blank=True)
     banckAccount=models.IntegerField(null=True, blank=True)

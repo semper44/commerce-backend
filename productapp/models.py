@@ -41,6 +41,7 @@ class Cart(models.Model):
     owners= models.ForeignKey(Profile, on_delete=models.CASCADE)
     completed= models.CharField(max_length=20, choices=CART_CHOICES, default="no")
     item_qty= models.TextField()
+    totalAmount= models.IntegerField( blank=True, null=True)
     cartSize= models.TextField(default=0)
     reference=models.CharField(max_length=20, blank=True, null=True)
     # def __str__(self):

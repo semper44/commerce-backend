@@ -2,12 +2,11 @@ import json
 # import math
 import datetime
 from django.shortcuts import render, redirect
-from .serializers import productapi,productCartApi, Cartapi, MostBoughtCategoryapi
+from .serializers import productapi,productCartApi
 from .models import Product, Cart
 from profileapp.models import Profile
 from profileapp.serializers import profileapi
-from .permissions import Sellerspermission
-from django.http import HttpResponse
+from .permissions import SellersPermission
 import requests
 from django.contrib.auth.models import User
 
@@ -30,7 +29,7 @@ environ.Env.read_env()
 # Create your views here.
 class CreatePost(APIView):
     parser_classes= [MultiPartParser, FormParser]
-    permission_classes= [Sellerspermission | permissions.IsAuthenticated]
+    permission_classes= [SellersPermission, permissions.IsAuthenticated]
 
     def post(self, request, format=None):
         serializer= productapi(data=request.data)
@@ -45,7 +44,7 @@ class GetProducts(generics.ListCreateAPIView):
     serializer_class= productapi
 
 class DeleteProducts(APIView):
-    permission_classes= [Sellerspermission|permissions.IsAdminUser]
+    permission_classes= [SellersPermission|permissions.IsAdminUser]
 
     # permission_classes= ([permissions.IsAdminUser | permissions.IsAuthenticated])
     def delete(self, request, pk):
@@ -108,24 +107,27 @@ class AddToCart(APIView):
     parser_classes= [MultiPartParser, FormParser]
     permission_classes= [permissions.IsAuthenticated]
     def post(self, request, format=None):
-            if request.user.id:
-                profile=Profile.objects.get(user=request.user.id)
-                items= json.loads(request.data["item"])
-                
-                qty= request.data["item_qty"]
-                cartSize= json.loads(request.data["cartSize"])
-                
-                cart= Cart.objects.filter(owners=request.user.id, completed="no")
-                if cart.exists():
-                    cart.delete()
-                carts= Cart.objects.create(owners=profile, item_qty= qty, cartSize=cartSize)
-                for i in items:
-                    itemz=Product.objects.get(id=i)
-                    carts.item.add(itemz)
-                carts.save()
-                return Response(status=status.HTTP_200_OK)
-            else:
-                return Response({"msg": "Sorry, you dont have the necessary permissions for this"},status=status.HTTP_401_UNATHOURIZED)
+        if request.user.id:
+            profile=Profile.objects.get(user=request.user.id)
+            items= json.loads(request.data["item"])
+            
+            qty= request.data["item_qty"]
+            cartSize= json.loads(request.data["cartSize"])
+            totalAmount= json.loads(request.data["totalAmount"])
+            print(request.data)
+            print(totalAmount)
+            
+            cart= Cart.objects.filter(owners=request.user.id, completed="no")
+            if cart.exists():
+                cart.delete()
+            carts= Cart.objects.create(owners=profile, item_qty= qty, cartSize=cartSize, totalAmount=totalAmount)
+            for i in items:
+                itemz=Product.objects.get(id=i)
+                carts.item.add(itemz)
+            carts.save()
+            return Response(status=status.HTTP_200_OK)
+        else:
+            return Response({"msg": "Sorry, you dont have the necessary permissions for this"},status=status.HTTP_401_UNATHOURIZED)
 
 RETRIEVE_CART="taks.retrievecart"
 class RetrieveCart(APIView):
@@ -139,8 +141,8 @@ class RetrieveCart(APIView):
                     cartProduct= i.item.all()
                     item= productCartApi(cartProduct, many=True, context={'request':request})
                 #     preserint("i.item_qty")
-
-                datas={"serializer":item.data, "id":i.id, "cartSize":i.cartSize, "item_qty":i.item_qty}
+                print(i.totalAmount)
+                datas={"serializer":item.data, "id":i.id, "cartSize":i.cartSize, "item_qty":i.item_qty, "totalAmount":i.totalAmount}
                 cache.set(RETRIEVE_CART, datas)
                 return Response(datas, status=status.HTTP_200_OK)
             else:
@@ -149,13 +151,12 @@ class RetrieveCart(APIView):
         return Response(tasks, status=status.HTTP_200_OK)
 
 class PlaceOrder(APIView):
-    permission_classes= [permissions.IsAuthenticated]
-
+    permission_classes= [SellersPermission,  permissions.IsAuthenticated]
     def post(self, request, *args, **kwargs):       
         auth_token = env("PAYSTACK_AUTH_TOKEN")
-        # hed = {'Authorization': 'Bearer sk_test_339102877aede0b62c4c8baa085b424e84dcb0ce'}
-        hed2 = {'Authorization': 'Bearer'+" "+auth_token}
-        print(hed2)
+        hed = {'Authorization': 'Bearer sk_test_339102877aede0b62c4c8baa085b424e84dcb0ce'}
+        hed2 = {'Authorization': 'Barer'+""+auth_token}
+        print(request.user)
         cartId=request.data["cartId"]
         if cartId==None or cartId=="null":
             profile=Profile.objects.get(user=request.user.id)

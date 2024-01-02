@@ -51,6 +51,7 @@ urlpatterns = [
     path('blockuser/<int:pk>/', BlockUser.as_view(), name='blockuser'),   
     path('blockseller/<int:pk>/', BlockSeller.as_view(), name='blockseller'),   
     path('unblockseller/<int:pk>/', UnblockSeller.as_view(), name='unblockseller'),   
+    path('unblockuser/<int:pk>/', UnblockUser.as_view(), name='unblockuser'),   
     path('reset_password/', RequestPasswordResetEmail.as_view(),name="reset_password"),
     path('password-reset/<uidb64>/<token>/', PasswordTokenCheckAPI.as_view(), name='password-reset-confirm'),
     # path('password-change/', passwordChange,name="password-change"),

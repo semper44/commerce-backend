@@ -73,9 +73,10 @@ def addNotifications(sender, instance, created, **kwargs):
                 profile.notification.add(instance)
                 profile.save()
 
-@receiver(post_save, sender=Group)
-def blockuser(sender, instance, created, **kwargs):
-    sender_profile=Profile.objects.get(user=sender_.id)
-    pics_=sender_profile.pics
-    instance.pics=pics_
-    instance.save(update_fields=["pics"])
+# @receiver(post_save, sender=Group)
+# def blockuser(sender, instance, created, **kwargs):
+#     created:
+#     sender_profile=Profile.objects.get(user=sender.id)
+#     pics_=sender_profile.pics
+#     instance.pics=pics_
+#     instance.save(update_fields=["pics"])

@@ -110,29 +110,29 @@ class UserProfileDelete(APIView):
             return Response({"msg":"error"}, status=status.HTTP_400_BAD_REQUEST)
 
 class BlockSeller(APIView):
-    permission_classes=[permissions.IsAdminUser]
+    # permission_classes=[permissions.IsAdminUser]
     def  post(self, request, pk):
         user= User.objects.get(id = pk)
         profile= Profile.objects.get(id = pk)
         sellersgroup= User.objects.filter(id = pk, groups__name= "bannedSellers")
         groups= Group.objects.get(name = "bannedSellers")
         # 
-        if sellersgroup.exists()== False:
+        if sellersgroup.exists()== True:
+            return Response({"msg":"User already blocked"}, status=status.HTTP_400_BAD_REQUEST)         
+        else:
             groups.user_set.add(user)
             profile.blocked=True
             profile.save(update_fields=["blocked"])
-
-                    # user= self.request.user.id
             return Response(status=status.HTTP_200_OK)
-        else:
-            return Response({"msg":"User already blocked"}, status=status.HTTP_400_BAD_REQUEST)
-
+            
 class UnblockUser(APIView):
     def  post(self, request, pk):
         user= User.objects.get(id = pk)
         profile= Profile.objects.get(id = pk)
-        sellersgroup= User.objects.filter(id = pk, groups__name= "bannedSellers")
-        groups= Group.objects.get(name = "bannedSellers")
+        sellersgroup= User.objects.filter(id = pk, groups__name= "bannedUsers")
+        print("user3")
+        print(sellersgroup)
+        groups= Group.objects.get(name = "bannedUsers")
         # 
         if sellersgroup.exists()== True:
             groups.user_set.remove(user)
@@ -144,25 +144,40 @@ class UnblockUser(APIView):
             return Response({"msg":"User not blocked"}, status=status.HTTP_400_BAD_REQUEST)
 
 class UnblockSeller(APIView):
-    def post(self, request, username):
+    def  post(self, request, pk):
+        user= User.objects.get(id = pk)
+        profile= Profile.objects.get(id = pk)
+        sellersgroup= User.objects.filter(id = pk, groups__name= "bannedSellers")
+        groups= Group.objects.get(name = "bannedSellers")
+        print(profile.blocked)
+        print(type(profile.blocked))
+        if profile.blocked == True:
+            if sellersgroup.exists()== True:
+                groups.user_set.remove(user)
+                profile.blocked=False
+                profile.save(update_fields=["blocked"])
+                        # user= self.request.user.id
                 return Response(status=status.HTTP_200_OK)
+            else:
+                return Response({"msg":"User not blocked"}, status=status.HTTP_400_BAD_REQUEST)
+        else:
+                return Response({"msg":"User not blocked"}, status=status.HTTP_417_EXPECTATION_FAILED)
 
      
 class BlockUser(APIView):
-    permission_classes=[permissions.IsAdminUser]
     def  post(self, request, pk):
         user= User.objects.get(id = pk)
         profile= Profile.objects.get(id = pk)
         sellersgroup= User.objects.filter(id = pk, groups__name= "bannedUsers")
         groups= Group.objects.get(name = "bannedUsers")
-        # 
-        if sellersgroup.exists()== False:
+        if sellersgroup.exists()== True:
+            return Response({"msg":"error"}, status=status.HTTP_400_BAD_REQUEST)
+        else:
             groups.user_set.add(user)
             profile.blocked=True
             profile.save(update_fields=["blocked"])
             return Response(status=status.HTTP_200_OK)
-        else:
-            return Response({"msg":"error"}, status=status.HTTP_400_BAD_REQUEST)
+
 
 class SellersProfileForm(generics.UpdateAPIView):
     permission_classes= [permissions.IsAuthenticated]
@@ -179,7 +194,6 @@ class SellersProfileForm(generics.UpdateAPIView):
                 return Response("successful", status=status.HTTP_200_OK)
             else:
                 return Response(serializer.data, status=status.HTTP_400_BAD_REQUEST)
-
 
 
 ALL_FOLLOWERS_CACHE="tasks.followers"

@@ -18,28 +18,8 @@ class productCartApi(serializers.ModelSerializer):
     #     
     class Meta:
         model= Product
-        fields= ["id", "image", "category", "price", "sellers"]
+        fields= ["id", "image", "category", "price", "sellers", ]
 
-
-# class ProfileSerialized(serializers.ModelSerializer):
-#     class Meta:
-#         model= Profile
-#         fields= ['user']
-
-
-
-# class ProductSerialized(serializers.ModelSerializer):
-#     UserProfile = serializers.SerializerMethodField()  
-#     class Meta:
-#         model = Product
-#         fields =['description', 'price', 'size', 'UserProfile']
-
-#     def get_UserProfile(self, obj):
-#         # value = obj.get_values()
-#         # UserProfile = Profile.objects.filter(mergefields_contained_by=value)
-#         return "ProductSerialized"
-        
-    
 
 class Cartapi(serializers.ModelSerializer):
     item_qty = serializers.SerializerMethodField("_get_item_qty")  
@@ -55,7 +35,7 @@ class Cartapi(serializers.ModelSerializer):
     # product= productCartApi(many=True)
     class Meta:
         model= Cart
-        fields=["item_qty", "item"]
+        fields=["item_qty", "item", "totalAmount"]
         depth= 1
 
 class SimpleCartapi(serializers.ModelSerializer):
