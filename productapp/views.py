@@ -113,10 +113,7 @@ class AddToCart(APIView):
             
             qty= request.data["item_qty"]
             cartSize= json.loads(request.data["cartSize"])
-            totalAmount= json.loads(request.data["totalAmount"])
-            print(request.data)
-            print(totalAmount)
-            
+            totalAmount= json.loads(request.data["totalAmount"])            
             cart= Cart.objects.filter(owners=request.user.id, completed="no")
             if cart.exists():
                 cart.delete()
@@ -141,7 +138,6 @@ class RetrieveCart(APIView):
                     cartProduct= i.item.all()
                     item= productCartApi(cartProduct, many=True, context={'request':request})
                 #     preserint("i.item_qty")
-                print(i.totalAmount)
                 datas={"serializer":item.data, "id":i.id, "cartSize":i.cartSize, "item_qty":i.item_qty, "totalAmount":i.totalAmount}
                 cache.set(RETRIEVE_CART, datas)
                 return Response(datas, status=status.HTTP_200_OK)
@@ -194,8 +190,6 @@ class PlaceOrder(APIView):
             url = 'https://api.paystack.co/transaction/initialize'        
             response = requests.post(url, data=datum, headers=hed2)
             responses=response.json()
-            print(response)
-            print(responses)
             # link=response['data']['link']
             if responses["status"]==True:
                 return Response({"link":responses["data"]["authorization_url"], "code":200}, status=status.HTTP_200_OK)

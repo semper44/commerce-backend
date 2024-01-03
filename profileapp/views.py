@@ -130,8 +130,6 @@ class UnblockUser(APIView):
         user= User.objects.get(id = pk)
         profile= Profile.objects.get(id = pk)
         sellersgroup= User.objects.filter(id = pk, groups__name= "bannedUsers")
-        print("user3")
-        print(sellersgroup)
         groups= Group.objects.get(name = "bannedUsers")
         # 
         if sellersgroup.exists()== True:
@@ -149,8 +147,6 @@ class UnblockSeller(APIView):
         profile= Profile.objects.get(id = pk)
         sellersgroup= User.objects.filter(id = pk, groups__name= "bannedSellers")
         groups= Group.objects.get(name = "bannedSellers")
-        print(profile.blocked)
-        print(type(profile.blocked))
         if profile.blocked == True:
             if sellersgroup.exists()== True:
                 groups.user_set.remove(user)
