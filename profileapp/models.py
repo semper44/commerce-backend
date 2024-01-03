@@ -40,7 +40,7 @@ BLOCKEDUSERS_CHOICES=(
 
 class Profile(models.Model):
     user= models.OneToOneField(User, on_delete=models.CASCADE)
-    pics = models.ImageField(null = True, blank =True, upload_to=upload_to, default='/profile/default.png')
+    pics = models.ImageField(null = True, blank =True, upload_to=upload_to)
     location = models.CharField(max_length=70,null = True, blank =True)
     ratings_value=models.IntegerField( null=True, blank=True)
     voucher= models.CharField(max_length=100,null = True, blank =True)

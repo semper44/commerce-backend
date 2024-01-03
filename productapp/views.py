@@ -97,11 +97,11 @@ class EditProducts(generics.RetrieveUpdateAPIView):
 class sellers_product(generics.ListAPIView):
     serializer_class= productapi
     def get(self, request, pk, *args, **kwargs):
-                requester=self.request.user.id
-                user=pk
-                obj= Product.objects.filter(user=pk)
-                serializer= productapi(obj, many=True, context={'request':request})
-                return Response(serializer.data, status=status.HTTP_200_OK)
+        requester=self.request.user.id
+        user=pk
+        obj= Product.objects.filter(user=pk)
+        serializer= productapi(obj, many=True, context={'request':request})
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 class AddToCart(APIView):
     parser_classes= [MultiPartParser, FormParser]
@@ -154,9 +154,7 @@ class PlaceOrder(APIView):
     permission_classes= [SellersPermission,  permissions.IsAuthenticated]
     def post(self, request, *args, **kwargs):       
         auth_token = env("PAYSTACK_AUTH_TOKEN")
-        hed = {'Authorization': 'Bearer sk_test_339102877aede0b62c4c8baa085b424e84dcb0ce'}
-        hed2 = {'Authorization': 'Barer'+""+auth_token}
-        print(request.user)
+        hed2 = {'Authorization': 'Bearer'+""+auth_token}      
         cartId=request.data["cartId"]
         if cartId==None or cartId=="null":
             profile=Profile.objects.get(user=request.user.id)
