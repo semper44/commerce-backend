@@ -182,6 +182,7 @@ class SellersProfileForm(generics.UpdateAPIView):
         if user.tags == "seller":
             return Response("already a seller", status=status.HTTP_226_IM_USED)
         else:
+            print(request.data)
             serializer= profileapi(user,data=request.data, partial=True)
             if serializer.is_valid():
                 serializer.save()
@@ -189,7 +190,10 @@ class SellersProfileForm(generics.UpdateAPIView):
                 user.save(update_fields=["tags"]) 
                 return Response("successful", status=status.HTTP_200_OK)
             else:
+                print(serializer.errors)
+                print(serializer.error_messages)
                 return Response(serializer.data, status=status.HTTP_400_BAD_REQUEST)
+
 
 
 ALL_FOLLOWERS_CACHE="tasks.followers"

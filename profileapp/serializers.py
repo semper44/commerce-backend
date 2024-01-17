@@ -4,7 +4,7 @@ from django.utils.encoding import smart_str, force_str, smart_bytes, DjangoUnico
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 from rest_framework.exceptions import AuthenticationFailed
-from rest_framework_simplejwt.tokens import RefreshToken, TokenError
+# from rest_framework_simplejwt.tokens import RefreshToken, TokenError
 
 
 
@@ -34,6 +34,7 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
 
 
 class profileapi(serializers.ModelSerializer):
+    accountNumber = serializers.IntegerField()
     class Meta:
         model= Profile
         fields= "__all__"

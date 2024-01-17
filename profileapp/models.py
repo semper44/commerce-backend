@@ -49,7 +49,7 @@ class Profile(models.Model):
     followers= models.ManyToManyField(User,related_name="followers", symmetrical=False, blank=True)
     following= models.ManyToManyField(User,related_name="following", symmetrical=False, blank=True)
     banckAccount=models.IntegerField(null=True, blank=True)
-    accountNumber=models.IntegerField(null=True, blank=True)
+    accountNumber=models.BigIntegerField(null=True, blank=True)
     subaccount_percentage=models.IntegerField(null=True, blank=True)
     subaccountId=models.CharField(max_length=30, null=True, blank=True)
     phoneNumber=models.CharField(null=True, blank=True, max_length=50)
