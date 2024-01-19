@@ -1,7 +1,9 @@
 from django.db import models
 from django.contrib.auth.models import User
-from django.utils import timezone
+# from django.utils import timezone
 from django.utils.text import slugify
+from cloudinary.models import CloudinaryField
+
 
 
 # Create your models here.
@@ -40,7 +42,7 @@ BLOCKEDUSERS_CHOICES=(
 
 class Profile(models.Model):
     user= models.OneToOneField(User, on_delete=models.CASCADE)
-    pics = models.ImageField(null = True, blank =True, upload_to=upload_to)
+    pics = CloudinaryField(null = True, blank =True)
     location = models.CharField(max_length=70,null = True, blank =True)
     ratings_value=models.IntegerField( null=True, blank=True)
     voucher= models.CharField(max_length=100,null = True, blank =True)
@@ -105,6 +107,6 @@ class Review(models.Model):
     sender = models.ForeignKey(Profile, on_delete= models.CASCADE,  related_name= "sender_review")
     sender_name= models.CharField(max_length=50,null=True, blank=True,)
     receiver = models.ForeignKey(Profile, on_delete= models.CASCADE,  related_name= "receiver_review")
-    pics= models.ImageField(null=True, blank=True,)
+    pics= CloudinaryField(null=True, blank=True,)
     def __str__(self):
         return f"{self.value}-{self.receiver}"

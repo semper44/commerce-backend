@@ -1,6 +1,7 @@
 from datetime import datetime
 from django.db import models
 from profileapp.models import Profile
+from cloudinary.models import CloudinaryField
 
 # from django.contrib.postgres.fields.jsonb import JSONField
 
@@ -21,12 +22,12 @@ PRODUCT_CHOICES=(
 class Product(models.Model):
     category= models.CharField( max_length= 50, choices= PRODUCT_CHOICES)
     description = models.CharField(max_length=70, blank=True, null=True)
-    image = models.ImageField(null = True, blank =True, upload_to=upload_to, default='/posts/default.png')
+    image = CloudinaryField(null = True, blank =True, default='/posts/default.png')
     price = models.FloatField()
     sellers= models.ForeignKey(Profile, on_delete= models.CASCADE,  related_name= "sellers")
     size = models.IntegerField(blank=True, null=True)
     color = models.CharField(max_length=70, blank=True, null=True)
-    sellerName = models.CharField(max_length=70,default="kosi")
+    sellerName = models.CharField(max_length=70)
 
     def __str__(self):
         return self.category

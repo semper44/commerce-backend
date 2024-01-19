@@ -15,6 +15,9 @@ from datetime import timedelta
 import os
 import dj_database_url
 import environ
+import cloudinary
+import cloudinary.uploader
+import cloudinary.api	
 
 env= environ.Env()
 environ.Env.read_env()
@@ -83,6 +86,7 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt.token_blacklist',
     "corsheaders",
     'drf_multiple_model',
+    'cloudinary',
     # "crispy_forms",
       
 ]
@@ -295,4 +299,10 @@ CORS_ALLOW_METHODS = [
     'POST',
     'PUT',
 ]
+
+cloudinary.config( 
+  	cloud_name ='dboagqxsq',
+  	api_key =725341687541998,
+  	api_secret ='mECBTg47TvbhaXePH3Gb4Z78hzg'
+)
 
