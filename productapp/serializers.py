@@ -7,18 +7,27 @@ import json
 
 
 class productapi(serializers.ModelSerializer):
+    image_url = serializers.SerializerMethodField()
+
+    def get_image_url(self, obj):
+        # Assuming obj.pics is a Cloudinary resource
+        if obj.image:
+            # Extract the Cloudinary public ID
+            public_id = obj.image.public_id
+            # Construct the full Cloudinary image URL
+            cloudinary_url = f'http://res.cloudinary.com/dboagqxsq/image/upload/{public_id}'
+            return cloudinary_url
+        return None  
+    
     class Meta:
         model= Product
         fields= "__all__"
 
 class productCartApi(serializers.ModelSerializer):
-    # qty= serializers.SerializerMethodField("product_qty")
-
-    # def product_qty(self, id):
-    #     
+    
     class Meta:
         model= Product
-        fields= ["id", "image", "category", "price", "sellers", ]
+        fields= ["id", "image", 'image_url',"category", "price", "sellers", ]
 
 
 class Cartapi(serializers.ModelSerializer):

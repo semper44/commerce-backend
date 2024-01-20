@@ -82,6 +82,8 @@ class ListProductsBSellers(APIView):
         user= Product.objects.filter(sellers=profuser)
         serializer= productapi(user, many=True, context={'request':request})
         length=(len(user))
+        for i in serializer.data:
+            print(i)
         if length==0:
             return Response({"msg":"No products yet"}, status=status.HTTP_417_EXPECTATION_FAILED)
         else:
@@ -149,8 +151,7 @@ class RetrieveCart(APIView):
 class PlaceOrder(APIView):
     permission_classes= [SellersPermission,  permissions.IsAuthenticated]
     def post(self, request, *args, **kwargs):       
-        auth_token = env("PAYSTACK_AUTH_TOKEN")
-        hed2 = {'Authorization': 'Bearer'+""+auth_token}      
+        hed2 = {'Authorization': 'Bearer sk_test_339102877aede0b62c4c8baa085b424e84dcb0ce'}      
         cartId=request.data["cartId"]
         if cartId==None or cartId=="null":
             profile=Profile.objects.get(user=request.user.id)

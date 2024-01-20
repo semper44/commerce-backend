@@ -76,14 +76,15 @@ class UserRegistrationView(generics.CreateAPIView):
 
 class UserProfileDetails(APIView):
     def  get(self, request, username):
-        # user= self.request.user.id
         try:
             prof= User.objects.get(username=username)
-            user= Profile.objects.filter(user=prof) 
-            serializer= profileapi(user, many=True, context={'request':request})
+            user= Profile.objects.get(user=prof) 
+            serializer= profileapi(user, context={'request':request})
             return Response(serializer.data, status=status.HTTP_200_OK)
-        except:
-            return Response({"msg":"Profile does not exist"}, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            print('hi4', str(e))
+            return Response({"msg": "Profile does not exist"}, status=status.HTTP_400_BAD_REQUEST)
+
 
 
 class prof_pics_update(generics.UpdateAPIView):

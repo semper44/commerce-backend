@@ -11,6 +11,8 @@ from rest_framework.exceptions import AuthenticationFailed
 from django.contrib.auth.models import User
 from rest_framework import serializers
 
+
+
 class UserRegistrationSerializer(serializers.ModelSerializer):
     password2 = serializers.CharField(write_only=True)
 
@@ -35,12 +37,34 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
 
 class profileapi(serializers.ModelSerializer):
     accountNumber = serializers.IntegerField()
+    image_url = serializers.SerializerMethodField()
+
     class Meta:
         model= Profile
         fields= "__all__"
+    def get_image_url(self, obj):
+        # Assuming obj.pics is a Cloudinary resource
+        if obj.pics:
+            # Extract the Cloudinary public ID
+            public_id = obj.pics.public_id
+            # Construct the full Cloudinary image URL
+            cloudinary_url = f'http://res.cloudinary.com/dboagqxsq/image/upload/{public_id}'
+            return cloudinary_url
+        return None
+
+
 
 class Someprofileapi(serializers.ModelSerializer):
     username = serializers.CharField(source="user.username", read_only=True)
+    def get_image_url(self, obj):
+        # Assuming obj.pics is a Cloudinary resource
+        if obj.pics:
+            # Extract the Cloudinary public ID
+            public_id = obj.pics.public_id
+            # Construct the full Cloudinary image URL
+            cloudinary_url = f'http://res.cloudinary.com/dboagqxsq/image/upload/{public_id}'
+            return cloudinary_url
+        return None
     class Meta:
         model= Profile
         fields= ("pics", "username", "id", "tags", "blocked")
@@ -48,6 +72,15 @@ class Someprofileapi(serializers.ModelSerializer):
 
 
 class FollowersApi(serializers.ModelSerializer):
+    def get_image_url(self, obj):
+        # Assuming obj.pics is a Cloudinary resource
+        if obj.pics:
+            # Extract the Cloudinary public ID
+            public_id = obj.pics.public_id
+            # Construct the full Cloudinary image URL
+            cloudinary_url = f'http://res.cloudinary.com/dboagqxsq/image/upload/{public_id}'
+            return cloudinary_url
+        return None
     class Meta:
         model= Profile
         fields=("pics", "location", "businessName", "name")

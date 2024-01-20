@@ -22,7 +22,7 @@ PRODUCT_CHOICES=(
 class Product(models.Model):
     category= models.CharField( max_length= 50, choices= PRODUCT_CHOICES)
     description = models.CharField(max_length=70, blank=True, null=True)
-    image = CloudinaryField(null = True, blank =True, default='/posts/default.png')
+    image = CloudinaryField('image', null = True, blank =True, default='/posts/default.png')
     price = models.FloatField()
     sellers= models.ForeignKey(Profile, on_delete= models.CASCADE,  related_name= "sellers")
     size = models.IntegerField(blank=True, null=True)
