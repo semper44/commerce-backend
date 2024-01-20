@@ -56,6 +56,8 @@ class profileapi(serializers.ModelSerializer):
 
 class Someprofileapi(serializers.ModelSerializer):
     username = serializers.CharField(source="user.username", read_only=True)
+    image_url = serializers.SerializerMethodField()
+
     def get_image_url(self, obj):
         # Assuming obj.pics is a Cloudinary resource
         if obj.pics:
@@ -67,7 +69,7 @@ class Someprofileapi(serializers.ModelSerializer):
         return None
     class Meta:
         model= Profile
-        fields= ("pics", "username", "id", "tags", "blocked")
+        fields= ("pics", "username",'image_url', "id", "tags", "blocked")
 
 
 
