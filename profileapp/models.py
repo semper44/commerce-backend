@@ -42,7 +42,7 @@ BLOCKEDUSERS_CHOICES=(
 
 class Profile(models.Model):
     user= models.OneToOneField(User, on_delete=models.CASCADE)
-    pics = CloudinaryField('image', null = True, blank =True)
+    pics = CloudinaryField('image', null = True, blank =True, default ='c40te5wgb08lfd5em1pq')
     location = models.CharField(max_length=70,null = True, blank =True)
     ratings_value=models.IntegerField( null=True, blank=True)
     voucher= models.CharField(max_length=100,null = True, blank =True)

@@ -93,9 +93,22 @@ class RelationshipApi(serializers.ModelSerializer):
         fields= "__all__"
 
 class ReviewApi(serializers.ModelSerializer):
+    image_url = serializers.SerializerMethodField()
+    
     class Meta:
         model= Review
         fields= "__all__"
+    def get_image_url(self, obj):
+        # Assuming obj.pics is a Cloudinary resource
+        if obj.pics:
+            # Extract the Cloudinary public ID
+            public_id = obj.pics.public_id
+            # Construct the full Cloudinary image URL
+            cloudinary_url = f'http://res.cloudinary.com/dboagqxsq/image/upload/{public_id}'
+            return cloudinary_url
+        return None
+
+
 
 class NotificationApi(serializers.ModelSerializer):
     class Meta:

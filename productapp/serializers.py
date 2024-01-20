@@ -27,21 +27,10 @@ class productCartApi(serializers.ModelSerializer):
     
     class Meta:
         model= Product
-        fields= ["id", "image", 'image_url',"category", "price", "sellers", ]
+        fields= ["id", "image","category", "price", "sellers", ]
 
 
 class Cartapi(serializers.ModelSerializer):
-    item_qty = serializers.SerializerMethodField("_get_item_qty")  
-    # item=("id", "image", "category", "price")
-    def _get_item_qty(self, obj):
-        qty={}
-        for i in json.loads(obj.item_qty):
-            qty[i] = qty.get(i, 0) + 1
-        return qty
-    # value = obj.get_values(
-    # UserProfile = Profile.objects.filter(mergefields_contained_by=value)
-        # 
-    # product= productCartApi(many=True)
     class Meta:
         model= Cart
         fields=["item_qty", "item", "totalAmount"]

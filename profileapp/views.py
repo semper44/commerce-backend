@@ -249,11 +249,9 @@ class Follow(APIView):
     permission_classes= [permissions.IsAuthenticated]
     def post(self, request, username, format=None):
             sender = request.user.id
-            user= User.objects.get(username=username)
-            receiver =user.id
-            receiver_followers= Profile.objects.filter(user=user)
-            followers=receiver_followers.values_list("followers")
-            follow=len(followers)
+            profile = get_object_or_404(Profile.objects.select_related('user'), user__username=username)
+            receiver = profile.user.id
+            follow = profile.followers.count()
             #             # profiles = friend.friends.get(id=id)
             data={"sender":sender, "receiver":receiver, "status":"accept", "followers":follow}
             serializer= RelationshipApi(data=data)
@@ -267,19 +265,22 @@ class Follow(APIView):
 class Unfollow(APIView):
     permission_classes= [permissions.IsAuthenticated]
     def post(self, request, username, format=None):
-            sender = request.user.id
-            user= User.objects.get(username=username)
-            receiver =user.id
-            receiver_followers= Profile.objects.filter(user=user)
-            followers=receiver_followers.values_list("followers")
-            follow=len(followers)
-            data={"sender":sender, "receiver":receiver, "status":"delete", "followers":follow}
-            serializer= RelationshipApi(data=data)
-            if serializer.is_valid():
-                serializer.save()
-                return Response(serializer.data, status=status.HTTP_200_OK)
-            else:
-                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        sender = request.user.id
+        profile = get_object_or_404(Profile.objects.select_related('user'), user__username=username)
+        receiver = profile.user.id
+        follow = profile.followers.count()
+        # followers=receiver_followers.values_list("followers")
+        # follow=len(followers)
+        # follow = receiver_followers.first().followers.count()
+        data={"sender":sender, "receiver":receiver, "status":"delete", "followers":follow}
+        serializer= RelationshipApi(data=data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
 
 class AllProfiles(generics.ListAPIView):
     queryset= Profile.objects.all()
@@ -413,18 +414,22 @@ class CreateReview(APIView):
 
     def post(self, request, format=None):
         receiver= User.objects.get(username=request.data["receiver"])
-        data={
-            "value":request.data["value"],
-            "text":request.data["text"],
-            "sender":request.data["sender"],
-            "receiver":receiver.id
-        }
-        serializer= ReviewApi(data=data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_200_OK)
+        existing_reviews = Review.objects.filter(sender_name=request.data["sender"], receiver=receiver.id)
+        if existing_reviews.exists():
+            return Response(serializer.data, status=status.HTTP_417_EXPECTATION_FAILED)
         else:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            data={
+                "value":request.data["value"],
+                "text":request.data["text"],
+                "sender":request.data["sender"],
+                "receiver":receiver.id
+            }
+            serializer= ReviewApi(data=data)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            else:
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 # class AllReviews(APIView):
 #     def  get(self, request, pk):
