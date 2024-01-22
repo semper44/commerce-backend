@@ -14,7 +14,7 @@ from .views import (
     ConfirmAndUpdateOrder,
     MostBoughtCategory,
     AllCategories,
-    SearchApiview
+    SearchResultsView
     )
 
 urlpatterns = [
@@ -31,10 +31,12 @@ urlpatterns = [
     path('retrievecart/', RetrieveCart.as_view(), name='retrievecart'),   
     path('user/allproducts/', sellers_product.as_view(), name='orders'),   
     path('placeorder/', PlaceOrder.as_view(), name='placeorders'),   
-    path('search/', SearchApiview.as_view(), name='search'), 
+    # path('search/', SearchApiview.as_view(), name='search'), 
     path('confirmandupdateorder/', ConfirmAndUpdateOrder.as_view(), name='confirmandupdateorder'),   
     path('mostboughtcategory/', MostBoughtCategory.as_view(), name='mostboughtcategory'),   
-    path('categories/', AllCategories.as_view(), name='categories'),   
+    path('categories/', AllCategories.as_view(), name='categories'),  
+    path('api/search/', SearchResultsView.as_view(), name='search_api'),
+ 
   
     # path('cart/<int:pk>/', CartView.as_view(), name='cart'),   
 ]

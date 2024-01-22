@@ -18,15 +18,20 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ('username', 'password', 'password2')
+        fields = ('username', 'email', 'password', 'password2')
 
     def validate(self, attrs):
         if attrs['password'] != attrs['password2']:
             raise serializers.ValidationError("Passwords do not match.")
         return attrs
+    
+    def validate_email(self, value):
+        if User.objects.filter(email=value).exists():
+            raise serializers.ValidationError("An account with this email already exists.")
+        return value
 
     def create(self, validated_data):
-        user = User(username=validated_data['username'])
+        user = User(username=validated_data['username'], email=validated_data['email'])
         user.set_password(validated_data['password'])
         user.save()
         return user
@@ -153,7 +158,7 @@ class SetNewPasswordSerializer(serializers.Serializer):
             token = attrs.get('token')
             uidb64 = attrs.get('uidb64')
 
-            id = force_str(urlsafe_base64_decode(uidb64))
+            id = uidb64
             user = User.objects.get(id=id)
             if not PasswordResetTokenGenerator().check_token(user, token):
                 raise AuthenticationFailed('The reset link is invalid', 401)

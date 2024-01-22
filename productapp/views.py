@@ -2,12 +2,13 @@ import json
 # import math
 import datetime
 from django.shortcuts import render, redirect
-from .serializers import productapi,productCartApi
+from .serializers import productapi,productCartApi, SearchResultsSerializer
 from .models import Product, Cart
 from profileapp.models import Profile
 from profileapp.serializers import profileapi
 from .permissions import SellersPermission
 import requests
+from django.db.models import Q
 from django.contrib.auth.models import User
 
 # import secrets
@@ -82,8 +83,6 @@ class ListProductsBSellers(APIView):
         user= Product.objects.filter(sellers=profuser)
         serializer= productapi(user, many=True, context={'request':request})
         length=(len(user))
-        for i in serializer.data:
-            print(i)
         if length==0:
             return Response({"msg":"No products yet"}, status=status.HTTP_417_EXPECTATION_FAILED)
         else:
@@ -285,46 +284,45 @@ class AllCategories(APIView):
 #     serializer_class= productapi
 #     filter_class = ProductSearchFilter
 #     search_fields=['category', 'price', 'size', 'description' ]
+# from rest_framework.views import APIView
+# from rest_framework.response import Response
+# from rest_framework import status
+# from .models import Product, Profile
+# from .serializers import SearchResultsSerializer
 
-    # filterset_backends=(DjangoFilterBackend)
-class SearchApiview(FlatMultipleModelAPIView):
-    def get_querylist(self):
-        category=self.request.query_params.get("category", None)
-        size=self.request.query_params.get("size", None)
-        price=self.request.query_params.get("price", None)
-        color=self.request.query_params.get("color", None)
-        profile=self.request.query_params.get("profile", None)
-        product=self.request.query_params.get("product", None)      
-        if (category==None or category=='') and (price==None or price=='') and (size==None or len(size)==0) and (color==None or color=='')and (profile==None or profile==''):
-            return
-        elif category and (price==None or price=='') and (size==None or size=='') and (color==None or color=='')and (profile==None or profile==''):
-            return [{'queryset':Product.objects.filter(category=category), 'serializer_class':productapi}]
-        
-        elif (size) and (price==None or price=='') and (category==None or category=='') and (color==None or color=='')and (profile==None or profile==''):
-                        return [{'queryset':Product.objects.filter(size=int(size)), 'serializer_class':productapi}]
-        
-        elif price and (category==None or category=='') and (size==None or size=='') and (color==None or color=='')and (profile==None or profile==''):
-            return [{'queryset':Product.objects.filter(price__lte=int(price)), 'serializer_class':productapi}   ]
-        
-        elif color and (price==None or price=='') and (size==None or size=='') and (category==None or category=='')and (profile==None or profile==''):
-            return  [{'queryset':Product.objects.filter(color=color), 'serializer_class':productapi}]
-        
-        elif profile and (price==None or price=='') and (size==None or size=='') and (color==None or color=='')and (category==None or category==''):
-                        return [{'queryset':Profile.objects.filter(user=int(profile)), 'serializer_class':profileapi}
-    ]
-        elif price and category and size==None and color==None and profile==None:
-            return  [{'queryset':Product.objects.filter(category=category, price__range=(1, int(price))), 'serializer_class':productapi}]
-        # elif category and price
-        #     return Product.objects.filter(category=category)
-        elif category and price and color  and size==None and profile==None:
-            return [{'queryset':Product.objects.filter(category=category, color=color, price__range=(1, int(price))), 'serializer_class':productapi}]
-       
-        elif price and color and size and category==None and profile==None:
-                        return [{'queryset':Product.objects.filter(color=color, size=int(size), price__range=(1, int(price))), 'serializer_class':productapi}]
-        
-        
-# In a Django-like app:
+# views.py
 
+class SearchResultsView(APIView):
+    serializer_class = SearchResultsSerializer
+
+    def get(self, request, *args, **kwargs):
+        query = self.request.query_params.get('query', '')
+        size = self.request.query_params.get('size', '')
+        color = self.request.query_params.get('color', '')
+        price = self.request.query_params.get('price', '')
+
+        # Perform separate queries for Product and Profile
+        product_results = Product.objects.filter(Q(description__icontains=query )| Q(category__icontains=query ))
+        profile_results = Profile.objects.filter(
+            Q(user__username__icontains=query) |
+            Q(location__icontains=query)
+        )
+
+        # Add optional filters for Product
+        if size:
+            product_results = product_results.filter(size=size)
+        if color:
+            product_results = product_results.filter(color=color)
+        if price:
+            product_results = product_results.filter(price=price)
+
+        # Serialize the combined results
+        serializer = SearchResultsSerializer({
+            'products': product_results,
+            'profiles': profile_results
+        })
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
 # class CreateCheckOutSession(APIView):
 #     def post(self, request, *args, **kwargs):
 #         prod_id=self.kwargs["pk"]

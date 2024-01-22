@@ -1,5 +1,4 @@
-import json
-import requests
+from django.utils.encoding import force_bytes
 import datetime
 from django.utils.encoding import smart_str, smart_bytes, DjangoUnicodeDecodeError
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
@@ -8,6 +7,7 @@ from django.contrib.sites.shortcuts import get_current_site
 from django.urls import reverse
 from .utils import Util
 from django.core.cache import cache
+import environ
 # import pytz
 from django.shortcuts import redirect, render, get_object_or_404
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
@@ -41,6 +41,9 @@ from .serializers import (
 # class CustomRedirect(HttpResponsePermanentRedirect):
 
 #     allowed_schemes = [os.environ.get('APP_SCHEME'), 'http', 'https']
+
+env= environ.Env()
+environ.Env.read_env()
 
 class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
     @classmethod
@@ -82,7 +85,6 @@ class UserProfileDetails(APIView):
             serializer= profileapi(user, context={'request':request})
             return Response(serializer.data, status=status.HTTP_200_OK)
         except Exception as e:
-            print('hi4', str(e))
             return Response({"msg": "Profile does not exist"}, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -183,7 +185,6 @@ class SellersProfileForm(generics.UpdateAPIView):
         if user.tags == "seller":
             return Response("already a seller", status=status.HTTP_226_IM_USED)
         else:
-            print(request.data)
             serializer= profileapi(user,data=request.data, partial=True)
             if serializer.is_valid():
                 serializer.save()
@@ -191,8 +192,6 @@ class SellersProfileForm(generics.UpdateAPIView):
                 user.save(update_fields=["tags"]) 
                 return Response("successful", status=status.HTTP_200_OK)
             else:
-                print(serializer.errors)
-                print(serializer.error_messages)
                 return Response(serializer.data, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -297,27 +296,25 @@ class RequestPasswordResetEmail(generics.GenericAPIView):
     serializer_class = ResetPasswordEmailRequestSerializer
 
     def post(self, request, format=None):
-        # serializer = self.serializer_class(data=request.data)
+        emailurl=env("EmailUrl")
         email = request.data["email"]
-        username= request.user.username
-        if User.objects.filter(email=email).exists():
-            user = User.objects.get(email=email)
-            uidb64 = urlsafe_base64_encode(smart_bytes(user.id))
-            token = PasswordResetTokenGenerator().make_token(user)
-            # current_site = get_current_site(
-            #     request=request).domain
-            relativeLink = reverse(
-                'password-reset-confirm', kwargs={'uidb64': uidb64, 'token': token})
-            redirect_url = request.data.get('redirect_url', '')
-            url=" http://localhost:3000"
 
-            absurl = 'http://'+url+ relativeLink
+        if User.objects.filter(email=email).exists():
+            token_generator = PasswordResetTokenGenerator()
+            user = User.objects.get(email=email)
+            token = token_generator.make_token(user)
+            relativeLink = reverse('password-reset-confirm', kwargs={'uidb64': user.id, 'token': token})
+            redirect_url = request.data.get('redirect_url', '')
+            EmailUrl=emailurl
+            absurl = EmailUrl+ relativeLink
             email_body = 'Hello, \n Use link below to reset your password  \n' + \
                 absurl
             data = {'email_body': email_body, 'to_email': user.email,
                     'email_subject': 'Reset your passsword'}
             Util.send_email(data)
-        return Response({'success': 'We have sent you a link to reset your password'}, status=status.HTTP_200_OK)
+            return Response({'success': 'We have sent you a link to reset your password'}, status=status.HTTP_200_OK)
+        else:
+            return Response({'success': 'Please enter the email you registered with'}, status=status.HTTP_404_NOT_FOUND)
 
 
 class PasswordTokenCheckAPI(generics.GenericAPIView):
@@ -327,7 +324,7 @@ class PasswordTokenCheckAPI(generics.GenericAPIView):
 
         # redirect_url = request.GET.get('redirect_url')
         try:
-            id = smart_str(urlsafe_base64_decode(uidb64))
+            id = uidb64
             user = User.objects.get(id=id)
 
             if not PasswordResetTokenGenerator().check_token(user, token):

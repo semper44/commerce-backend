@@ -1,5 +1,6 @@
 from .models import Product, Cart
 from profileapp.models import Profile
+from profileapp.serializers import profileapi
 from rest_framework import serializers
 import json
 
@@ -55,8 +56,48 @@ class MostBoughtCategoryapi(serializers.ModelSerializer):
         fields=["category"]
         # depth= 1
        
-       
-     
-        
-        
+# Assuming you have serializers for Product and Profile models, create or update them as follows:
+
+class ProductSerializer(serializers.ModelSerializer):
+    image_url = serializers.SerializerMethodField()
+
+    def get_image_url(self, obj):
+        # Assuming obj.pics is a Cloudinary resource
+        if obj.image:
+            # Extract the Cloudinary public ID
+            public_id = obj.image.public_id
+            # Construct the full Cloudinary image URL
+            cloudinary_url = f'http://res.cloudinary.com/dboagqxsq/image/upload/{public_id}'
+            return cloudinary_url
+        return None 
+    class Meta:
+        model = Product
+        fields = '__all__'
+
+class ProfileSerializer(serializers.ModelSerializer):
+    image_url = serializers.SerializerMethodField()
+
+    def get_image_url(self, obj):
+        # Assuming obj.pics is a Cloudinary resource
+        if obj.pics:
+            # Extract the Cloudinary public ID
+            public_id = obj.pics.public_id
+            # Construct the full Cloudinary image URL
+            cloudinary_url = f'http://res.cloudinary.com/dboagqxsq/image/upload/{public_id}'
+            return cloudinary_url
+        return None 
+    class Meta:
+        model = Profile
+        fields = '__all__'
+
+
+class SearchResultsSerializer(serializers.Serializer):
+    products = ProductSerializer(many=True)
+    profiles = ProfileSerializer(many=True)
+
+    def to_representation(self, instance):
+        return {
+            'products': ProductSerializer(instance.get('products', []), many=True).data,
+            'profiles': ProfileSerializer(instance.get('profiles', []), many=True).data,
+        }
 
