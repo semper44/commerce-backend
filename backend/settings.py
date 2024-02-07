@@ -36,23 +36,23 @@ HOST = env('HOST')
 PASSWORD = env('PASSWORD')
  
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = 'RENDER' not in os.environ
+DEBUG = False
 
-ALLOWED_HOSTS = ["127.0.0.1:8000", "127.0.0.1", "https://72a98ca2ea3f04790e5a3e15b95bd53e.serveo.net"]
+ALLOWED_HOSTS = ["127.0.0.1:8000"]
 
 RENDER_EXTERNAL_HOSTNAME = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
-if RENDER_EXTERNAL_HOSTNAME:
-    SESSION_COOKIE_SECURE= True
-    CSRF_COOKIE_SECURE=True
-    SECURE_HSTS_SECONDS=3600
-    SECURE_SSL_REDIRECT=True
-    SECURE_HSTS_INCLUDE_SUBDOMAINS =True
-    SECURE_HSTS_PRELOAD =True
-    ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
+# if RENDER_EXTERNAL_HOSTNAME:
+SESSION_COOKIE_SECURE= True
+CSRF_COOKIE_SECURE=True
+SECURE_HSTS_SECONDS=3600
+SECURE_SSL_REDIRECT=True
+SECURE_HSTS_INCLUDE_SUBDOMAINS =True
+SECURE_HSTS_PRELOAD =True
+ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
 
 
-DATABASE_URL= config('HOST')
-DATABASES = {'default':dj_database_url.parse(DATABASE_URL)}
+# DATABASE_URL= config('HOST')
+# DATABASES = {'default':dj_database_url.parse(DATABASE_URL, conn_max_age=600)}
 
 # DATABASES = {
 #     'default': {
@@ -141,12 +141,12 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 #     )
 # }
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': BASE_DIR / 'db.sqlite3',
-#     }
-# }
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
+    }
+ }
 
 
 # Password validation
