@@ -45,25 +45,33 @@ if RENDER_EXTERNAL_HOSTNAME:
     SECURE_HSTS_INCLUDE_SUBDOMAINS =True
     SECURE_HSTS_PRELOAD =True
     ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
+
     DATABASES = {
-        'default': {
-
-            'ENGINE' : 'django.db.backends.postgresql_psycopg2',
-
-            'NAME': 'postgres',
-
-            'HOST' :HOST,
-
-            'PASSWORD':PASSWORD,
-
-            'PORT': 5432,
-
-            'USER': 'postgres',
-
-        }
-
-
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
+    }
 }
+
+#     DATABASES = {
+#         'default': {
+
+#             'ENGINE' : 'django.db.backends.postgresql_psycopg2',
+
+#             'NAME': 'postgres',
+
+#             'HOST' :HOST,
+
+#             'PASSWORD':PASSWORD,
+
+#             'PORT': 5432,
+
+#             'USER': 'postgres',
+
+#         }
+
+
+# }
 
 
 
@@ -131,12 +139,7 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 #     )
 # }
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': BASE_DIR / 'db.sqlite3',
-#     }
-# }
+
 
 
 # Password validation
