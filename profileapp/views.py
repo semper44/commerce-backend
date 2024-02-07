@@ -165,7 +165,7 @@ class BlockUser(APIView):
 
 class SellersProfileForm(generics.UpdateAPIView):
     permission_classes= [permissions.IsAuthenticated]
-     def  patch(self, request, pk):
+    def  patch(self, request, pk):
         user= Profile.objects.get(user=pk) 
         if user.tags == "seller":
             return Response("already a seller", status=status.HTTP_226_IM_USED)
