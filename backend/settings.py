@@ -51,9 +51,6 @@ if RENDER_EXTERNAL_HOSTNAME:
     ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
 
 
-DATABASE_URL= config('HOST')
-DATABASES = {'default':dj_database_url.parse(DATABASE_URL, conn_max_age=600)}
-
 # DATABASES = {
 #     'default': {
 
@@ -141,12 +138,12 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 #     )
 # }
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': BASE_DIR / 'db.sqlite3',
-#     }
-# }
+ DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
+    }
+ }
 
 
 # Password validation
