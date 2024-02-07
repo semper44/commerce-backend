@@ -14,6 +14,7 @@ from pathlib import Path
 from datetime import timedelta
 import os
 import dj_database_url
+from decouple import config
 import environ
 import cloudinary
 import cloudinary.uploader
@@ -49,25 +50,29 @@ if RENDER_EXTERNAL_HOSTNAME:
     SECURE_HSTS_PRELOAD =True
     ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
 
-DATABASES = {
-    'default': {
 
-        'ENGINE' : 'django.db.backends.postgresql_psycopg2',
+DATABASE_URL= config('HOST')
+DATABASES = {'default':dj_database_url.parse(DATABASE_URL, conn_max_age=600)}
 
-        'NAME': 'postgres',
+# DATABASES = {
+#     'default': {
 
-        'HOST' :HOST,
+#         'ENGINE' : 'django.db.backends.postgresql_psycopg2',
 
-        'PASSWORD':PASSWORD,
+#         'NAME': 'postgres',
 
-        'PORT': 5432,
+#         'HOST' :HOST,
 
-        'USER': 'postgres',
+#         'PASSWORD':PASSWORD,
 
-    }
+#         'PORT': 5432,
+
+#         'USER': 'postgres',
+
+#     }
 
 
-}
+# }
 
 
 
